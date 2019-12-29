@@ -19,7 +19,9 @@ package com.example.android.videoplayersample
 import android.content.Context
 import android.media.AudioManager
 import android.net.Uri
-import android.support.v4.media.AudioAttributesCompat
+//import android.support.v4.media.AudioAttributesCompat
+import androidx.media.AudioAttributesCompat
+
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -143,9 +145,9 @@ class PlayerHolder(private val context: Context,
                 info { "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady" }
             }
 
-            override fun onPlayerError(error: ExoPlaybackException?) {
-                info { "playerError: $error" }
-            }
+//            override fun onPlayerError(error: ExoPlaybackException?) {
+//                info { "playerError: $error" }
+//            }
 
             fun getStateString(state: Int): String {
                 return when (state) {
