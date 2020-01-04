@@ -61,6 +61,7 @@ class PlayerHolder(private val context: Context,
                 audioManager,
                 ExoPlayerFactory.newSimpleInstance(context, DefaultTrackSelector())
                         .also { playerView.player = it }
+
         )
         info { "SimpleExoPlayer created" }
     }
@@ -83,6 +84,7 @@ class PlayerHolder(private val context: Context,
     fun start() {
         // Load media.
         audioFocusPlayer.prepare(buildMediaSource())
+        audioFocusPlayer.repeatMode = Player.REPEAT_MODE_ALL
         // Restore state (after onResume()/onStart())
         with(playerState) {
             // Start playback when media has buffered enough

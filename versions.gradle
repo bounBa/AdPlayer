@@ -51,6 +51,8 @@ versions.timber = "4.6.0"
 versions.lifecycle_reactivestreams = "1.1.1"
 versions.auth0_lock = "2.16.0"
 versions.jwtdecode = "1.4.0"
+versions.ion = "3.0.8"
+versions.prdownloader = "0.6.0"
 
 def support = [:]
 support.annotations = "androidx.annotation:annotation:$versions.support"
@@ -140,6 +142,8 @@ deps.timber = "com.jakewharton.timber:timber:$versions.timber"
 deps.liveDateReactiveSterams = "android.arch.lifecycle:reactivestreams:$versions.lifecycle_reactivestreams"
 deps.auth0_lock = "com.auth0.android:lock:$versions.auth0_lock"
 deps.jwtdecode = "com.auth0.android:jwtdecode:$versions.jwtdecode"
+deps.ion = "com.koushikdutta.ion:ion:$versions.ion"
+deps.prdownloader = "com.mindorks.android:prdownloader:$versions.prdownloader"
 
 ext.build_versions = build_versions
 ext.deps = deps
