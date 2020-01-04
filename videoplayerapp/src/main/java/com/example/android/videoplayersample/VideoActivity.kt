@@ -24,6 +24,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.PixelFormat
 import android.media.AudioManager
 import android.net.Uri
 import android.os.*
@@ -34,6 +35,9 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Rational
+import android.view.Gravity
+import android.view.Window
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.downloader.*
@@ -59,6 +63,7 @@ import retrofit2.Response
 import java.io.*
 import java.util.jar.Manifest
 import kotlin.Error
+import kotlin.concurrent.fixedRateTimer
 
 /**
  * Allows playback of videos that are in a playlist, using [PlayerHolder] to load the and render
@@ -94,24 +99,32 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
     // Android lifecycle hooks.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+//        val manager = this@VideoActivity.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+//        val localLayoutParams = WindowManager.LayoutParams()
+//        localLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL
+//        localLayoutParams.gravity = Gravity.TOP
+//        localLayoutParams.flags =
+//            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+//
+//        localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+//        localLayoutParams.height = (50 * getResources()
+//            .getDisplayMetrics().scaledDensity).toInt()
+//        localLayoutParams.format = PixelFormat.TRANSPARENT
+//        val view = CustomViewGroup(this@VideoActivity)
+//
+//        manager.addView(view, localLayoutParams)
+
+
+
         setContentView(R.layout.activity_video)
 
-//        if (shouldAskPermissions()) {
-//            askPermissions()
-//        }
 
-//        prDownfile("https://vendor.hanbohui.org/v1/ads/ad1.mov", "ad1.mov")
-
-
-
-//        downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-
-//        download("Large", null, largeURL + noCache)
-//        download("Small", null, "https://vendor.hanbohui.org/v1/ads/ad1.mov")
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        supportActionBar?.hide()
 
         doUpsertID()
-//        doCheckAd()
-
 
         httpResult.observe(this, Observer { flag ->
             if (flag.result) {
@@ -119,12 +132,25 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
             }
         })
 
+        val fixedRateTimer = fixedRateTimer(
+            "checkAd",
+            false,
+            30*60*1000, 30*60*1000){
+            info {"time's up"}
+            doCheckAd()
+        }
+
+
 
         adList.observe(this, Observer { list ->
             info { list }
             if (list.size == 0) {
                 return@Observer
             }
+
+            MediaCatalog.list.clear()
+
+
             count = list.size
             list.forEach {
 
@@ -137,11 +163,17 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
                     }
                 )
 
-//                var filePath = File(Environment.getExternalStorageDirectory(), "Ads/")!!.absolutePath + "/${it.url}"
                 var file = File(filePath)
                 if (file.exists()){
                     count -= 1
                 } else {
+
+                    stopPlayer()
+                    deactivateMediaSession()
+
+                    releasePlayer()
+                    releaseMediaSession()
+
                     prDownfile("https://vendor.hanbohui.org/v1/ads/${it.url}", it.url)
                 }
 
@@ -167,8 +199,8 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-//        startPlayer()
-//        activateMediaSession()
+        startPlayer()
+        activateMediaSession()
     }
 
     override fun onStop() {
@@ -345,6 +377,8 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
             var mFile2: File? = File(Environment.getExternalStorageDirectory(), "Ads")
             System.out.println("File Foond " + mFile2!!.absolutePath)
+
+            info { urll }
 
             var downloadId = PRDownloader.download(urll, mFile2!!.absolutePath, fileName)
                 .build()
