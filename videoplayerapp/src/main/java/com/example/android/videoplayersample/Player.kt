@@ -35,6 +35,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import org.jetbrains.anko.toast
+import timber.log.Timber
 
 /**
  * Creates and manages a [com.google.android.exoplayer2.ExoPlayer] instance.
@@ -63,7 +64,7 @@ class PlayerHolder(private val context: Context,
                         .also { playerView.player = it }
 
         )
-        info { "SimpleExoPlayer created" }
+        Timber.i(  "SimpleExoPlayer created" )
     }
 
     private fun buildMediaSource(): MediaSource {
@@ -94,7 +95,7 @@ class PlayerHolder(private val context: Context,
             // Add logging.
             attachLogging(audioFocusPlayer)
         }
-        info { "SimpleExoPlayer is started" }
+        Timber.i(  "SimpleExoPlayer is started" )
     }
 
     // Stop playback and release resources, but re-use the player instance.
@@ -109,13 +110,13 @@ class PlayerHolder(private val context: Context,
             // Stop the player (and release it's resources). The player instance can be reused.
             stop(true)
         }
-        info { "SimpleExoPlayer is stopped" }
+        Timber.i(  "SimpleExoPlayer is stopped" )
     }
 
     // Destroy the player instance.
     fun release() {
         audioFocusPlayer.release() // player instance can't be used again.
-        info { "SimpleExoPlayer is released" }
+        Timber.i(  "SimpleExoPlayer is released" )
     }
 
     /**
@@ -144,12 +145,12 @@ class PlayerHolder(private val context: Context,
         // Write to log on state changes.
         exoPlayer.addListener(object : Player.DefaultEventListener() {
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                info { "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady" }
+                Timber.i( "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady" )
             }
 
-//            override fun onPlayerError(error: ExoPlaybackException?) {
-//                info { "playerError: $error" }
-//            }
+            override fun onPlayerError(error: ExoPlaybackException?) {
+                Timber.i(  "playerError: ${error.toString()}")
+            }
 
             fun getStateString(state: Int): String {
                 return when (state) {

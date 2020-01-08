@@ -60,6 +60,7 @@ import org.koin.android.ext.android.inject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import java.io.*
 import java.util.jar.Manifest
 import kotlin.Error
@@ -116,6 +117,7 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 //
 //        manager.addView(view, localLayoutParams)
 
+        Timber.i ( "VideoActivity onCreate Start")
 
 
         setContentView(R.layout.activity_video)
@@ -123,6 +125,17 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         supportActionBar?.hide()
+
+        Timber.i ( "Exoplayer starting")
+
+        volumeControlStream = AudioManager.STREAM_MUSIC
+        createMediaSession()
+        createPlayer()
+
+        startPlayer()
+        activateMediaSession()
+
+        Timber.i( "Exoplayer started")
 
         doUpsertID()
 
@@ -136,14 +149,15 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
             "checkAd",
             false,
             30*60*1000, 30*60*1000){
-            info {"time's up"}
+            Timber.i ("FixedRateTimer time's up")
             doCheckAd()
         }
 
 
 
         adList.observe(this, Observer { list ->
-            info { list }
+            Timber.i( "Ad list is fetched " )
+            Timber.i(  list.toString() )
             if (list.size == 0) {
                 return@Observer
             }
@@ -152,9 +166,11 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
 
             count = list.size
+
+            var stoppedFlag : Boolean = false
             list.forEach {
 
-
+                Timber.i(  it.toString() )
                 var filePath = File(Environment.getExternalStorageDirectory(), "Ads/")!!.absolutePath + "/${it.url}"
                 MediaCatalog.list.add(
                     with(MediaDescriptionCompat.Builder()) {
@@ -167,13 +183,17 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
                 if (file.exists()){
                     count -= 1
                 } else {
+                    if (!stoppedFlag){
+                        Timber.i(  "Stop Exoplayer")
+                        stopPlayer()
+                        deactivateMediaSession()
 
-                    stopPlayer()
-                    deactivateMediaSession()
+                        releasePlayer()
+                        releaseMediaSession()
+                        stoppedFlag = true
+                    }
 
-                    releasePlayer()
-                    releaseMediaSession()
-
+                    Timber.i( "Ad is downloading")
                     prDownfile("https://vendor.hanbohui.org/v1/ads/${it.url}", it.url)
                 }
 
@@ -182,6 +202,7 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
             if (count == 0) {
 
+                Timber.i(  "Start Exoplayer")
                 startPlayer()
                 activateMediaSession()
 
@@ -192,15 +213,13 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
 
         // While the user is in the app, the volume controls should adjust the music volume.
-        volumeControlStream = AudioManager.STREAM_MUSIC
-        createMediaSession()
-        createPlayer()
+
     }
 
     override fun onStart() {
         super.onStart()
-        startPlayer()
-        activateMediaSession()
+//        startPlayer()
+//        activateMediaSession()
     }
 
     override fun onStop() {
@@ -297,18 +316,21 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun doCheckAd() {
+        Timber.i( "DoCheckAd started")
         addToDisposable(dataModel.httpApi.getAdFileList(getDeviceId()).with()
             .doOnSubscribe {  }
             .doOnSuccess {  }
             .doOnError {  }
             .subscribe({
                 adList.value = it
+                Timber.i( "DoCheckAd replied successfully")
             }, {
                 // handle errors
             }))
     }
 
     private fun doUpsertID() {
+        Timber.i(  "Upserting Id")
         val idJson = AdPlayerId(getDeviceId())
         addToDisposable(dataModel.httpApi.upsertId(idJson).with()
             .doOnSubscribe {  }
@@ -316,6 +338,7 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
             .doOnError {  }
             .subscribe({
                 httpResult.value = it
+                Timber.i(  "Upserting Id replied successfully" )
             }, {
                 // handle errors
             }))
@@ -351,7 +374,7 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
             val file = DownloadManagerHelper.getDownloadedFile(this, id)
 
-           info {file.toString() + "\n\n"}
+            Timber.i( file.toString() + "\n\n")
 
             if (id in DownloadManagerHelper.getDownloads(this)) {
                 Handler().postDelayed({ checkDownload(id) }, 500)
@@ -378,7 +401,7 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
             var mFile2: File? = File(Environment.getExternalStorageDirectory(), "Ads")
             System.out.println("File Foond " + mFile2!!.absolutePath)
 
-            info { urll }
+        Timber.i(  urll )
 
             var downloadId = PRDownloader.download(urll, mFile2!!.absolutePath, fileName)
                 .build()

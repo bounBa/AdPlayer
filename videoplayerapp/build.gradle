@@ -41,6 +41,11 @@ androidExtensions {
     experimental = true
 }
 
+repositories {
+    jcenter()
+    maven { url "https://dl.bintray.com/bastienpaulfr/maven" }
+}
+
 dependencies {
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -90,6 +95,10 @@ dependencies {
 
     //prdownloader
     implementation deps.prdownloader
+
+    //Loging
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'fr.bipi.treessence:treessence:0.3.0'
 
 
 }
