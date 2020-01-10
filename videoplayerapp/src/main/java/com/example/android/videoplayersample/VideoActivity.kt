@@ -218,8 +218,8 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onStart() {
         super.onStart()
-//        startPlayer()
-//        activateMediaSession()
+        startPlayer()
+        activateMediaSession()
     }
 
     override fun onStop() {
@@ -234,6 +234,11 @@ class VideoActivity : AppCompatActivity(), AnkoLogger {
         releasePlayer()
         releaseMediaSession()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("Resumed")
     }
 
     // MediaSession related functions.
