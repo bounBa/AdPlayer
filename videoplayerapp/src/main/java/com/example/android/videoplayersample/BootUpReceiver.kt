@@ -8,6 +8,8 @@ class BootUpReceiver : BroadcastReceiver() {
 
 
     override fun onReceive(p0: Context?, p1: Intent?) {
+        Thread.sleep(5000)
+
         val i = Intent(p0, VideoActivity::class.java)
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         p0?.startActivity(i)
