@@ -49,7 +49,7 @@ import com.example.android.videoplayersample.download.DownloadManagerHelper
 import com.example.android.videoplayersample.extensions.with
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.leopold.mvvm.util.NotNullMutableLiveData
+import com.example.android.videoplayersample.util.NotNullMutableLiveData
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_video.*

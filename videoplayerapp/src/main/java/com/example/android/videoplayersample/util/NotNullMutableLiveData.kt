@@ -1,5 +1,4 @@
-package com.leopold.mvvm.util
-
+package com.example.android.videoplayersample.util
 import androidx.lifecycle.MutableLiveData
 
 /**

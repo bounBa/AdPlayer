@@ -1,4 +1,4 @@
-package com.leopold.mvvm.util
+package com.example.android.videoplayersample.util
 
 import java.util.concurrent.Executors
 
